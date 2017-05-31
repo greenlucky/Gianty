@@ -12,6 +12,7 @@ import scala.runtime.BoxedUnit;
 public class Alarm extends AbstractLoggingActor{
 
     public static class Activity {}
+
     public static class Password{
         public final String password;
         public Password(String password) {
@@ -71,6 +72,4 @@ public class Alarm extends AbstractLoggingActor{
     private void onActivity(Activity activity) {
         log().warning("oeoeoeooe, alarm alarm!!!");
     }
-
-
 }
