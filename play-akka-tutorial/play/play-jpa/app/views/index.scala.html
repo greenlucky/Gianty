@@ -1,0 +1,12 @@
+@()
+
+@main("Welcome to Play") {
+  <h1>Add person!</h1>
+
+  <ul id="persons"></ul>
+
+  <form method="post" action="@routes.PersonController.addPerson()">
+    <input type="text" name="name">
+    <button>Add Person</button>
+  </form>
+}

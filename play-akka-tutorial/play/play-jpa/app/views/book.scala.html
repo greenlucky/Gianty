@@ -1,0 +1,12 @@
+@()
+
+@main("Welcome to Play") {
+  <h1>Add book!</h1>
+
+  <ul id="books"></ul>
+
+  <form method="post" action="@routes.BookController.addBook()">
+    <input type="text" name="name">
+    <button>Add book</button>
+  </form>
+}
