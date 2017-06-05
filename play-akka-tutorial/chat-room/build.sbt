@@ -1,4 +1,4 @@
-name := """play-java-seed"""
+name := """chat-room"""
 organization := "com.example"
 
 version := "1.0-SNAPSHOT"
