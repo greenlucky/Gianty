@@ -1,5 +1,6 @@
 package Counter;
 
+import akka.actor.AbstractActor;
 import akka.actor.AbstractLoggingActor;
 import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
@@ -16,22 +17,25 @@ public class Counter extends AbstractLoggingActor{
     public static Props props(int initCounter) {
         return Props.create(Counter.class, () -> new Counter(initCounter));
     }
-    
+
+    @Override
+    public Receive createReceive() {
+        return receiveBuilder()
+                .match(Message.class, this::onMessage)
+                .build();
+    }
+
     public static class Message {}
 
     private int counter = 0;
 
     public Counter() {
-        receive(ReceiveBuilder
-                .match(Message.class, this::onMessage)
-                .build());
+
     }
 
     public Counter(int initCounter) {
         this.counter = initCounter;
-        receive(ReceiveBuilder
-                .match(Message.class, this::onMessage)
-                .build());
+
     }
 
     private void onMessage(Message message) {

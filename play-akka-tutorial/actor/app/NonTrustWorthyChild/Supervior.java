@@ -14,14 +14,6 @@ public class Supervior extends AbstractLoggingActor {
 
     final ActorRef child = getContext().actorOf( NonTrustWorthyChild.props(), "child" );
 
-    {
-        receive(
-                ReceiveBuilder
-                        .matchAny( command -> child.forward( command, getContext() ) )
-                        .build()
-        );
-    }
-
     @Override
     public SupervisorStrategy supervisorStrategy() {
         return new OneForOneStrategy(
@@ -29,6 +21,12 @@ public class Supervior extends AbstractLoggingActor {
                 Duration.create( 10, TimeUnit.SECONDS ),
                 DeciderBuilder.match( RuntimeException.class, ex -> stop() ).build()
         );
+    }
+
+    @Override
+    public Receive createReceive() {
+        return receiveBuilder().matchAny( command -> child.forward( command, getContext() ) )
+                .build();
     }
 
     private SupervisorStrategy.Directive stop() {

@@ -1,5 +1,6 @@
 package NonTrustWorthyChild;
 
+import akka.actor.AbstractActor;
 import akka.actor.AbstractLoggingActor;
 import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
@@ -9,14 +10,16 @@ import akka.japi.pf.ReceiveBuilder;
  */
 public class NonTrustWorthyChild extends AbstractLoggingActor {
 
+    @Override
+    public Receive createReceive() {
+        return receiveBuilder().match( Command.class, this::onCommand ).build();
+    }
+
     public static class Command {
     }
 
     private long messages = 0L;
 
-    {
-        receive( ReceiveBuilder.match( Command.class, this::onCommand ).build() );
-    }
 
     private void onCommand(Command command) {
         messages++;
