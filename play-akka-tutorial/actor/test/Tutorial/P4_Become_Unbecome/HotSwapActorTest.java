@@ -1,12 +1,12 @@
 package Tutorial.P4_Become_Unbecome;
 
+import Tutorial.P4_Become_Unbecome.HotSwap.HotSwapActor;
+import Tutorial.P4_Become_Unbecome.HotSwap.SenderHostSwapActor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by lam.nm on 6/8/2017.
@@ -23,13 +23,16 @@ class HotSwapActorTest {
     @Test
     void createReceive() throws InterruptedException {
         ActorRef hotSwap = system.actorOf(Props.create(HotSwapActor.class), "hot-swap-actor");
+        ActorRef senderHotSwap = system.actorOf(Props.create(SenderHostSwapActor.class), "sender-hot-swap-actor");
 
-        hotSwap.tell("foo", hotSwap);
-        hotSwap.tell("foo", hotSwap);
-        hotSwap.tell("bar", hotSwap);
-        hotSwap.tell("bar", hotSwap);
-        hotSwap.tell("Hi", hotSwap);
-        hotSwap.tell("foo", hotSwap);
+        hotSwap.tell("foo",senderHotSwap);
+        hotSwap.tell("bar", senderHotSwap);
+        hotSwap.tell("foo", senderHotSwap);
+        hotSwap.tell("Hi", senderHotSwap);
+        hotSwap.tell("foo", senderHotSwap);
+        hotSwap.tell("foo", senderHotSwap);
+        hotSwap.tell("bar", senderHotSwap);
+        hotSwap.tell("Hi", senderHotSwap);
 
         Thread.sleep(1000);
 
