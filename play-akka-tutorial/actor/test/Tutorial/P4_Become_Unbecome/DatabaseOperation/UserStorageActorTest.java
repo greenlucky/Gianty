@@ -6,7 +6,7 @@ import akka.actor.Props;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Optional;
 
 /**
  * Created by lam.nm on 6/10/2017.
@@ -26,8 +26,7 @@ class UserStorageActorTest {
         DBOperation dbOperation = new DBOperation();
         User user = new User("lam", "nguyenlamit86@gmail.com");
         userStorage.tell(Operation.Connect.class, ActorRef.noSender());
-        userStorage.tell(new Operation(dbOperation, Operation<user>), ActorRef.noSender());
+        userStorage.tell(new Operation(dbOperation, Optional.of(user)), ActorRef.noSender());
 
     }
-
 }
