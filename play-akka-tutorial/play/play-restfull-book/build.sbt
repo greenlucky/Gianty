@@ -10,4 +10,4 @@ scalaVersion := "2.11.11"
 libraryDependencies += filters
 libraryDependencies += javaJpa
 
-libraryDependencies += "uk.co.panaxiom" %% "play-jongo" % "2.0.0-jongo1.3"
+libraryDependencies += "org.hibernate" % "hibernate-entitymanager" % "5.1.0.Final"

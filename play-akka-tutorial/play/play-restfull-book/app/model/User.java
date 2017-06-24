@@ -1,16 +1,19 @@
 package model;
 
 
-import org.jongo.marshall.jackson.oid.MongoId;
-import org.jongo.marshall.jackson.oid.MongoObjectId;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 /**
  * Created by greenlucky on 6/3/17.
  */
+@Entity
 public class User{
 
-    @MongoId
-    @MongoObjectId
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String email;
@@ -24,8 +27,7 @@ public class User{
     public User() {
     }
 
-    public User(Long id, String email, String name, long birthday, String address) {
-        this.id = id;
+    public User(String email, String name, long birthday, String address) {
         this.email = email;
         this.name = name;
         this.birthday = birthday;
@@ -112,7 +114,7 @@ public class User{
         }
 
         public User createBuilder() {
-            return new User(id, email, name, birthday, address);
+            return new User(email, name, birthday, address);
         }
 
         @Override

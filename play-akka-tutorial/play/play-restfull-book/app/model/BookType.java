@@ -1,15 +1,16 @@
 package model;
 
-import org.jongo.marshall.jackson.oid.MongoId;
-import org.jongo.marshall.jackson.oid.MongoObjectId;
+
+import javax.persistence.*;
 
 /**
  * Created by greenlucky on 6/3/17.
  */
+@Entity
 public class BookType {
 
-    @MongoId
-    @MongoObjectId
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     private String name;

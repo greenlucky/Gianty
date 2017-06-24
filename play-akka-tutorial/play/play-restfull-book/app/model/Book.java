@@ -1,31 +1,40 @@
 package model;
 
 
-import org.jongo.marshall.jackson.oid.MongoId;
-import org.jongo.marshall.jackson.oid.MongoObjectId;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by greenlucky on 6/3/17.
  */
+@Entity
 public class Book {
 
-    @MongoId
-    @MongoObjectId
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    @NotNull
     private String name;
 
     private String description;
 
     private String author;
 
-    private String bookType;
+    @ManyToOne
+    private BookType bookType;
 
 
     public Book() {
     }
 
-    public Book(long id, String name, String description, String author, String bookType) {
+    public Book(String name, String description, String author, BookType bookType) {
+        this.name = name;
+        this.description = description;
+        this.author = author;
+        this.bookType = bookType;
+    }
+    public Book(long id, String name, String description, String author, BookType bookType) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -65,11 +74,11 @@ public class Book {
         this.author = author;
     }
 
-    public String getBookType() {
+    public BookType getBookType() {
         return bookType;
     }
 
-    public void setBookType(String bookType) {
+    public void setBookType(BookType bookType) {
         this.bookType = bookType;
     }
 
@@ -82,9 +91,16 @@ public class Book {
 
         private String author;
 
-        private String bookType;
+        private BookType bookType;
 
         public BookBuilder() {
+        }
+
+        public BookBuilder(String name, String description, String author, BookType bookType) {
+            this.name = name;
+            this.description = description;
+            this.author = author;
+            this.bookType = bookType;
         }
 
         public BookBuilder setId(long id) {
@@ -107,10 +123,12 @@ public class Book {
             return this;
         }
 
-        public BookBuilder setBookType(String bookType) {
+        public BookBuilder setBookType(BookType bookType) {
             this.bookType = bookType;
             return this;
         }
+
+        public Book createBuilder() {return new Book(name, description, author, bookType);}
     }
 
     @Override

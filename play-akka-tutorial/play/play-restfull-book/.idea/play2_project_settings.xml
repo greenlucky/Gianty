@@ -10,10 +10,18 @@
             </ProjectSettingsEntry>
           </value>
         </entry>
+        <entry key="play-restfull-book">
+          <value>
+            <ProjectSettingsEntry>
+              <option name="playDistrPath" value="$USER_HOME$/.ivy2/cache/com.typesafe.play/play_2.11/jars/play_2.11-2.5.14.jar" />
+            </ProjectSettingsEntry>
+          </value>
+        </entry>
         <entry key="root">
           <value>
             <ProjectSettingsEntry>
-              <option name="confDir" value="$PROJECT_DIR$/app" />
+              <option name="sourceDir" value="$PROJECT_DIR$/app" />
+              <option name="confDir" value="C:\Users\lam.nm\Documents\Gianty\play-akka-tutorial\play\play-restfull-book\app" />
               <option name="templateImports">
                 <list>
                   <option value="models._" />
@@ -38,7 +46,7 @@
                   <option value="play.libs.F" />
                 </list>
               </option>
-              <option name="uri" value="$PROJECT_DIR$" />
+              <option name="uri" value="/C:/Users/lam.nm/Documents/Gianty/play-akka-tutorial/play/play-restfull-book" />
             </ProjectSettingsEntry>
           </value>
         </entry>

@@ -1,32 +1,32 @@
 package model;
 
-import org.jongo.marshall.jackson.oid.MongoId;
-import org.jongo.marshall.jackson.oid.MongoObjectId;
-
+import javax.persistence.*;
 import java.util.List;
 
 /**
  * Created by greenlucky on 6/3/17.
  */
+@Entity
 public class Hire {
 
-    @MongoId
-    @MongoObjectId
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     private long hireDate;
 
     private long returnDate;
 
-    private String forUser;
+    @ManyToOne
+    private User forUser;
 
-
-    private List<String> books;
+    @OneToMany
+    private List<Book> books;
 
     public Hire() {
     }
 
-    public Hire(long id, long hireDate, long returnDate, String forUser, List<String> books) {
+    public Hire(long id, long hireDate, long returnDate, User forUser, List<Book> books) {
         this.id = id;
         this.hireDate = hireDate;
         this.returnDate = returnDate;
@@ -58,19 +58,19 @@ public class Hire {
         this.returnDate = returnDate;
     }
 
-    public String getForUser() {
+    public User getForUser() {
         return forUser;
     }
 
-    public void setForUser(String forUser) {
+    public void setForUser(User forUser) {
         this.forUser = forUser;
     }
 
-    public List<String> getBooks() {
+    public List<Book> getBooks() {
         return books;
     }
 
-    public void setBooks(List<String> books) {
+    public void setBooks(List<Book> books) {
         this.books = books;
     }
 
@@ -82,9 +82,9 @@ public class Hire {
 
         private long returnDate;
 
-        private String forUser;
+        private User forUser;
 
-        private List<String> books;
+        private List<Book> books;
 
         public HireBuilder() {
         }
@@ -104,17 +104,17 @@ public class Hire {
             return this;
         }
 
-        public HireBuilder setForUser(String forUser) {
+        public HireBuilder setForUser(User forUser) {
             this.forUser = forUser;
             return this;
         }
 
-        public HireBuilder setBooks(List<String> books) {
+        public HireBuilder setBooks(List<Book> books) {
             this.books = books;
             return this;
         }
 
-        public HireBuilder addBook(String book) {
+        public HireBuilder addBook(Book book) {
             this.books.add(book);
             return this;
         }
