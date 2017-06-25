@@ -88,7 +88,7 @@ public class UnitTest {
         final Http.RequestBuilder requestBuilder = new Http.RequestBuilder().method("get").bodyJson(Json.toJson(1));
 
         final CompletionStage<Result> stage = invokeWithContext(requestBuilder, () -> {
-           HttpExecutionContext ec = new HttpExecutionContext(ForkJoinPool.commonPool());
+            HttpExecutionContext ec = new HttpExecutionContext(ForkJoinPool.commonPool());
 
             FormFactory formFactory = mock(FormFactory.class);
             BookRepository repository = mock(BookRepository.class);

@@ -1,5 +1,6 @@
 package repositories;
 
+import play.db.jpa.Transactional;
 import services.DatabaseExecutionContext;
 import models.Person;
 import play.db.jpa.JPAApi;
@@ -33,14 +34,27 @@ public class JPAPersonRepository implements PersonRepository {
         return supplyAsync(() -> wrap(em -> insert(em, person)), executionContext);
     }
 
+
+
     @Override
     public CompletionStage<Stream<Person>> list() {
         return supplyAsync(() -> wrap(em -> list(em)), executionContext);
     }
 
+    @Transactional
+    @Override
+    public Person insert(Person person) {
+        jpaApi.withTransaction(() -> {
+            EntityManager em = jpaApi.em();
+           this.insert(person);
+        });
+        return person;
+    }
+
     private <T> T wrap(Function<EntityManager, T> function) {
         return jpaApi.withTransaction(function);
     }
+
 
     private Person insert(EntityManager em, Person person) {
         em.persist(person);
