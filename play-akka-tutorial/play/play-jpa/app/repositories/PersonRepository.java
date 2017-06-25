@@ -15,4 +15,6 @@ public interface PersonRepository {
     CompletionStage<Person> add(Person person);
 
     CompletionStage<Stream<Person>> list();
+
+    Person insert(Person person);
 }

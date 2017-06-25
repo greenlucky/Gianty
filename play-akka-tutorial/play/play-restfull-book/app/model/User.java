@@ -117,15 +117,15 @@ public class User{
             return new User(email, name, birthday, address);
         }
 
-        @Override
-        public String toString() {
-            return "UserBuilder{" +
-                    "id=" + id +
-                    ", email='" + email + '\'' +
-                    ", name='" + name + '\'' +
-                    ", birthday=" + birthday +
-                    ", address='" + address + '\'' +
-                    '}';
-        }
+    }
+    @Override
+    public String toString() {
+        return "UserBuilder{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", birthday=" + birthday +
+                ", address='" + address + '\'' +
+                '}';
     }
 }

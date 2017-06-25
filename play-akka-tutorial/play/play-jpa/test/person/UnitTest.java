@@ -14,8 +14,10 @@ import play.mvc.Result;
 import play.twirl.api.Content;
 
 import javax.validation.Validator;
+import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -87,7 +89,20 @@ public class UnitTest {
                         result.status() == SEE_OTHER, "Should redirect after operation"
                 )
         );
+    }
 
+    @Test
+    public void addPerson() throws Exception {
+        PersonRepository repository = mock(PersonRepository.class);
+        Person person = new Person.PersonBuilder()
+                .setId(1L)
+                .setName("Lam DevOps")
+                .createPerson();
+        person = repository.insert(person);
+        CompletionStage<Stream<Person>> result = repository.list();
+        System.out.println(person);
+
+        Thread.sleep(100);
 
     }
 }
