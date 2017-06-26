@@ -9,6 +9,8 @@ GET     /persons                    controllers.PersonController.getPersons()
 
 GET     /book                       controllers.BookController.index
 POST    /book                       controllers.BookController.addBook()
+GET     /add-books                  controllers.BookController.addBooks()
+GET     /sadd-books                  controllers.BookController.synAddBooks()
 GET     /books                      controllers.BookController.getBooks()
 GET     /delete-book             controllers.BookController.deleteBook(id:Long)
 

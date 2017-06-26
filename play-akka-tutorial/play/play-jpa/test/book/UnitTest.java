@@ -1,17 +1,24 @@
 package book;
 
+import com.google.inject.Inject;
 import controllers.BookController;
 import models.Book;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import play.data.FormFactory;
 import play.data.format.Formatters;
+import play.db.jpa.JPAApi;
+import play.db.jpa.Transactional;
 import play.i18n.MessagesApi;
 import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Http;
 import play.mvc.Result;
+import play.test.WithApplication;
 import play.twirl.api.Content;
 import repositories.BookRepository;
+import repositories.SBookRepository;
 
 import javax.validation.Validator;
 import java.util.concurrent.CompletionStage;
@@ -23,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static play.mvc.Http.Status.OK;
 import static play.mvc.Http.Status.SEE_OTHER;
@@ -32,14 +40,18 @@ import static play.test.Helpers.invokeWithContext;
 /**
  * Created by greenlucky on 6/3/17.
  */
-public class UnitTest {
+public class UnitTest extends WithApplication{
+
+    @Inject
+    private JPAApi jpaApi;
 
     @Test
     public void checkIndex() {
         BookRepository repository = mock(BookRepository.class);
+        SBookRepository srepository = mock(SBookRepository.class);
         FormFactory formFactory = mock(FormFactory.class);
         HttpExecutionContext ec = new HttpExecutionContext(ForkJoinPool.commonPool());
-        final BookController controller = new BookController(formFactory, repository, ec);
+        final BookController controller = new BookController(formFactory, repository, srepository, ec);
         final Result result = controller.index();
 
         assertThat(result.status()).isEqualTo(OK);
@@ -58,6 +70,7 @@ public class UnitTest {
         Validator validator = mock(Validator.class);
         FormFactory formFactory = new FormFactory(messages, new Formatters(messages), validator);
 
+        SBookRepository srepository = mock(SBookRepository.class);
         BookRepository repository = mock(BookRepository.class);
         Book book = new Book.BookBuilder()
                 .setId(1L)
@@ -71,7 +84,7 @@ public class UnitTest {
         final CompletionStage<Result> stage = invokeWithContext(requestBuilder, () -> {
             HttpExecutionContext ec = new HttpExecutionContext(ForkJoinPool.commonPool());
 
-            final BookController controller = new BookController(formFactory, repository, ec);
+            final BookController controller = new BookController(formFactory, repository, srepository, ec);
             return controller.addBook();
         });
 
@@ -83,6 +96,29 @@ public class UnitTest {
         );
     }
 
+
+    @Test
+    public void checkAddBooks() throws Exception {
+        MessagesApi messages = mock(MessagesApi.class);
+        Validator validator = mock(Validator.class);
+        FormFactory formFactory = new FormFactory(messages, new Formatters(messages), validator);
+
+        BookRepository repository = mock(BookRepository.class);
+        SBookRepository srepository = mock(SBookRepository.class);
+
+        final Http.RequestBuilder requestBuilder = new Http.RequestBuilder().method("get");
+
+        final Result stage = invokeWithContext(requestBuilder, () -> {
+            HttpExecutionContext ec = new HttpExecutionContext(ForkJoinPool.commonPool());
+
+            final BookController controller = new BookController(formFactory, repository,srepository, ec);
+            return controller.addBooks();
+        });
+
+        Thread.sleep(100);
+
+    }
+
     @Test
     public void removeBook() throws Exception {
         final Http.RequestBuilder requestBuilder = new Http.RequestBuilder().method("get").bodyJson(Json.toJson(1));
@@ -92,7 +128,8 @@ public class UnitTest {
 
             FormFactory formFactory = mock(FormFactory.class);
             BookRepository repository = mock(BookRepository.class);
-            final BookController controller = new BookController(formFactory, repository, ec);
+            SBookRepository srepository = mock(SBookRepository.class);
+            final BookController controller = new BookController(formFactory, repository,srepository, ec);
             return controller.deleteBook(1);
         });
 
@@ -101,5 +138,18 @@ public class UnitTest {
                         result.status() == SEE_OTHER, ""
                 )
         );
+    }
+
+    @Transactional
+    @Test
+    public void addBoosTest() throws Exception {
+        SBookRepository repository = mock(SBookRepository.class);
+        Book book = new Book.BookBuilder().setName("Java 1").createBook();
+        when(repository.add(book)).thenReturn(book);
+
+       /* book.setId(0);
+        verify(repository).add(book);*/
+
+        System.out.println(book.toString());
     }
 }
