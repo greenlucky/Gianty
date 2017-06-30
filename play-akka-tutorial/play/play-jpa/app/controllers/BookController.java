@@ -25,7 +25,7 @@ public class BookController extends Controller {
     private final BookRepository bookRepository;
     private final SBookRepository sBookRepository;
     private final HttpExecutionContext ec;
-    private int numQuery = 1000;
+    private int numQuery = 1;
 
     @Inject
     public BookController(FormFactory formFactory, BookRepository bookRepository, SBookRepository sBookRepository ,HttpExecutionContext ec) {

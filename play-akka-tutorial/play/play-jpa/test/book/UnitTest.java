@@ -3,6 +3,8 @@ package book;
 import com.google.inject.Inject;
 import controllers.BookController;
 import models.Book;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -20,6 +22,7 @@ import play.twirl.api.Content;
 import repositories.BookRepository;
 import repositories.SBookRepository;
 
+import javax.persistence.EntityManager;
 import javax.validation.Validator;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ForkJoinPool;
@@ -34,16 +37,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static play.mvc.Http.Status.OK;
 import static play.mvc.Http.Status.SEE_OTHER;
-import static play.test.Helpers.contentAsString;
-import static play.test.Helpers.invokeWithContext;
+import static play.test.Helpers.*;
 
 /**
  * Created by greenlucky on 6/3/17.
  */
-public class UnitTest extends WithApplication{
+public class UnitTest{
 
     @Inject
     private JPAApi jpaApi;
+
+    @Before
+    public void init() throws Exception {
+        jpaApi = mock(JPAApi.class);
+    }
 
     @Test
     public void checkIndex() {
@@ -140,16 +147,21 @@ public class UnitTest extends WithApplication{
         );
     }
 
-    @Transactional
     @Test
     public void addBoosTest() throws Exception {
-        SBookRepository repository = mock(SBookRepository.class);
-        Book book = new Book.BookBuilder().setName("Java 1").createBook();
-        when(repository.add(book)).thenReturn(book);
+        running(fakeApplication(), new Runnable() {
 
-       /* book.setId(0);
-        verify(repository).add(book);*/
+            @Transactional
+            @Override
+            public void run() {
+                SBookRepository repository = mock(SBookRepository.class);
+                Book book = new Book.BookBuilder().setName("Java 1").createBook();
+                when(repository.add(book)).thenReturn(book);
+            }
+        });
 
-        System.out.println(book.toString());
+
+        Thread.sleep(100);
+
     }
 }

@@ -29,10 +29,14 @@ public class SJPABookRepository implements SBookRepository{
 
     @Override
     public Book add(Book book) {
-        jpaApi.withTransaction(() -> {
+        //jpaApi.withTransaction(() -> {
             EntityManager em = jpaApi.em();
-            insert(em, book);
-        });
+            em.getTransaction().begin();
+            //insert(em, book);
+            em.persist(book);
+            em.getTransaction().commit();
+            em.close();
+        //});
         return book;
     }
 

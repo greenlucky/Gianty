@@ -9,8 +9,9 @@ scalaVersion := "2.11.11"
 
 libraryDependencies += javaJpa
 libraryDependencies += javaJdbc
-libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.36"
-libraryDependencies += "org.hibernate" % "hibernate-core" % "5.2.5.Final"
+libraryDependencies += javaWs
+//libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.36"
+libraryDependencies += "org.hibernate" % "hibernate-entitymanager" % "5.2.5.Final"
 
 //JPA
 //PlayKeys.externalizeResources := false
