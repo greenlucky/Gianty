@@ -1,9 +1,9 @@
-package cluster
+package cluster.frontend_backend
 
-import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.actor.ActorSystem
 import commons.Add
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
+import scala.concurrent.duration.{Duration, MILLISECONDS}
 
 /**
   * Created by lamdevops on 6/29/17.

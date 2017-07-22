@@ -1,5 +1,6 @@
 package repositories;
 
+import play.db.jpa.JPA;
 import play.db.jpa.Transactional;
 import services.DatabaseExecutionContext;
 import models.Person;
@@ -41,7 +42,6 @@ public class JPAPersonRepository implements PersonRepository {
         return supplyAsync(() -> wrap(em -> list(em)), executionContext);
     }
 
-    @Transactional
     @Override
     public Person insert(Person person) {
         jpaApi.withTransaction(() -> {

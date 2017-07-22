@@ -1,4 +1,4 @@
-package cluster
+package cluster.frontend_backend
 
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props, RootActorPath}
 import akka.cluster.Cluster
@@ -39,6 +39,6 @@ object Backend {
 
     val system = ActorSystem("ClusterSystem", config)
 
-    val Backend = system.actorOf(Props[Backend], name = "cluster.Backend")
+    val Backend = system.actorOf(Props[Backend], name = "cluster.frontend_backend.Backend")
   }
 }

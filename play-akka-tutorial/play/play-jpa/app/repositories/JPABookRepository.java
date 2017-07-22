@@ -1,6 +1,8 @@
 package repositories;
 
 import models.Book;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.db.jpa.JPAApi;
 import services.DatabaseExecutionContext;
 
@@ -18,6 +20,8 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
  */
 public class JPABookRepository implements BookRepository{
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JPABookRepository.class);
+    
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext executionContext;
 
@@ -29,7 +33,13 @@ public class JPABookRepository implements BookRepository{
 
     @Override
     public CompletionStage<Book> add(Book book) {
+        LOGGER.info("Install book: [{}]", book);
         return supplyAsync(() -> wrap(em -> insert(em, book)), executionContext);
+    }
+
+    @Override
+    public CompletionStage<Book> get(long bookId) {
+        return supplyAsync(() -> wrap(em -> get(em, bookId)), executionContext);
     }
 
     @Override
@@ -47,13 +57,31 @@ public class JPABookRepository implements BookRepository{
     }
 
     private Book insert(EntityManager em, Book book) {
-        em.persist(book);
+        jpaApi.withTransaction(() -> {
+            em.persist(book);
+        });
+
+        return book;
+    }
+
+    private Book get(EntityManager em, long id) {
+        Book book = em.find(Book.class, id);
         return book;
     }
 
     private boolean remove(EntityManager em, long id) {
         try {
-            em.remove(id);
+            em.createQuery("delete from Book b where b.id =" + id).executeUpdate();
+            return true;
+        }catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean remove(EntityManager em, Book book) {
+        try {
+            em.remove(book);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

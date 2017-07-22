@@ -1,8 +1,8 @@
-package cluster
+package cluster.frontend_backend
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props, Terminated}
-import commons.{Add, BackendRegistration}
 import com.typesafe.config.ConfigFactory
+import commons.{Add, BackendRegistration}
 
 import scala.util.Random
 

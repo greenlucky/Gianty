@@ -3,41 +3,44 @@ package cluster_sharding
 import akka.actor.{ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.persistence.PersistentActor
+import cluster_sharding.Counter.CounterChanged
+
 import scala.concurrent.duration._
 
-
 /**
-  * Created by lam.nm on 6/30/2017.
+  * Created by lamdevops on 7/8/17.
   */
 class Counter extends PersistentActor with ActorLogging {
   import Counter._
-
-  var count = 0
-
   context.setReceiveTimeout(120.seconds)
 
-  override def persistenceId: String = self.path.parent.name + "-" + self.path.name
+  var count = 0;
+  
+  override def persistenceId: String = self.path.parent.name + "_" + self.path.name
 
-  def updateState(evt: CounterChanged): Unit =
+  def updateCounter(evt: CounterChanged): Unit = {
     count += evt.delta
+  }
 
-  override def receiveRecover: Receive = {
-    case evt : CounterChanged => updateState(evt)
+  override def receiveRecover: Receive =  {
+    case evt : CounterChanged => updateCounter(evt)
   }
 
   override def receiveCommand: Receive = {
     case Increment =>
-      log.info(s"Counter with path: ${self} received Increment Command")
+      log.info(s"Couter path: ${self} received increment Command")
+      persist(CounterChanged(+1))(updateCounter)
     case Decrement =>
-      log.info(s"Counter with path: ${self} received Descrement Command")
+      log.info(s"Counter path: ${self} received decrement Command")
+      persist(CounterChanged(-1))(updateCounter)
     case Get =>
-      log.info(s"Counter with path: ${self} received Get Command")
+      log.info(s"Counter path: ${self} received get Command")
       log.info(s"Count = ${count}")
       sender() ! count
     case Stop =>
+      log.info(s"Counter path ${self} received stop Command")
       context.stop(self)
   }
-
 }
 
 object Counter {
@@ -56,19 +59,15 @@ object Counter {
 
   case class CounterChanged(delta: Int) extends Event
 
-  // Sharding Name
-  val shardName: String = "Counter"
+  val shardName: String = "cluster"
 
-  // outside world if he want to send message to sharding should use this message
-  case class CounterMessage(id: Long, cmd: Command)
+  case class CounterMessage(id: Long, command: Command)
 
-  // id extractor
   val idExtractor: ShardRegion.ExtractEntityId = {
     case CounterMessage(id, msg) => (id.toString, msg)
   }
 
-  // shard resolve
-  val shardResolver : ShardRegion.ExtractShardId = {
+  val shardResolver: ShardRegion.ExtractShardId = {
     case CounterMessage(id, msg) => (id % 12).toString
   }
 

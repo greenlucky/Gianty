@@ -14,6 +14,8 @@ public interface BookRepository {
 
     CompletionStage<Book> add(Book book);
 
+    CompletionStage<Book> get(long bookId);
+
     CompletionStage<Stream<Book>> list();
 
     CompletionStage<Boolean> delete(long id);

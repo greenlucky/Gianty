@@ -1,6 +1,8 @@
 package controllers;
 
 import models.Person;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import repositories.PersonRepository;
 import play.data.FormFactory;
 import play.libs.concurrent.HttpExecutionContext;
@@ -23,6 +25,8 @@ public class PersonController extends Controller {
     private final PersonRepository personRepository;
     private final HttpExecutionContext ec;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
+
     @Inject
     public PersonController(FormFactory formFactory, PersonRepository personRepository, HttpExecutionContext ec) {
         this.formFactory = formFactory;
@@ -36,9 +40,11 @@ public class PersonController extends Controller {
 
     public CompletionStage<Result> addPerson() {
         Person person = formFactory.form(Person.class).bindFromRequest().get();
+
+        LOGGER.info("Add person: [{}]", person.toString());
         return personRepository.add(person).thenApplyAsync(p -> {
-            return redirect(routes.PersonController.index());
-        }, ec.current());
+            return ok(toJson(p));
+        });
     }
 
     public CompletionStage<Result> getPersons() {

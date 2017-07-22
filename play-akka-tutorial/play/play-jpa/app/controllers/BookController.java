@@ -1,6 +1,8 @@
 package controllers;
 
 import models.Book;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.data.FormFactory;
 import play.db.jpa.Transactional;
 import play.libs.concurrent.HttpExecutionContext;
@@ -20,6 +22,9 @@ import static play.libs.Json.toJson;
  * Created by greenlucky on 6/3/17.
  */
 public class BookController extends Controller {
+
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookController.class);
 
     private final FormFactory formFactory;
     private final BookRepository bookRepository;
@@ -41,14 +46,17 @@ public class BookController extends Controller {
 
     public CompletionStage<Result> addBook() {
         Book book = formFactory.form(Book.class).bindFromRequest().get();
+        LOGGER.info("Add book: {}", book);
         return bookRepository.add(book).thenApplyAsync(b -> {
+            LOGGER.info("Added book: {}", b);
             return redirect(routes.BookController.index());
         }, ec.current());
     }
 
     public CompletionStage<Result> deleteBook(long id) {
         return bookRepository.delete(id).thenApplyAsync(b -> {
-            return redirect(routes.BookController.index());
+            LOGGER.info("{}", b);
+            return ok(toJson(b));
         }, ec.current());
     }
 
@@ -56,6 +64,12 @@ public class BookController extends Controller {
         return bookRepository.list().thenApplyAsync(b -> {
             return ok(toJson(b.collect(Collectors.toList())));
         }, ec.current());
+    }
+
+    public CompletionStage<Result> getBook(long id) {
+        return bookRepository.get(id).thenApplyAsync(b -> {
+            return ok(toJson(b));
+        });
     }
 
     public Result addBooks() {
@@ -68,9 +82,9 @@ public class BookController extends Controller {
             bookRepository.add(book);
         });
         long endTime = System.currentTimeMillis();
-        System.out.println("EndTime: " + endTime);
+        LOGGER.info("End time: {}", endTime);
         long result = endTime - startTime;
-        System.out.println("Result: " + result);
+        LOGGER.info("End result: {}", result);
         return ok(String.valueOf(result));
     }
 

@@ -1,23 +1,25 @@
 package book;
 
-import com.google.inject.Inject;
 import controllers.BookController;
 import models.Book;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import play.Application;
 import play.data.FormFactory;
 import play.data.format.Formatters;
+import play.db.jpa.DefaultJPAApi;
+import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
-import play.db.jpa.Transactional;
 import play.i18n.MessagesApi;
+import play.inject.guice.GuiceApplicationBuilder;
+import play.inject.guice.Guiceable;
 import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Http;
 import play.mvc.Result;
-import play.test.WithApplication;
 import play.twirl.api.Content;
 import repositories.BookRepository;
 import repositories.SBookRepository;
@@ -32,9 +34,7 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static play.mvc.Http.Status.OK;
 import static play.mvc.Http.Status.SEE_OTHER;
 import static play.test.Helpers.*;
@@ -44,12 +44,13 @@ import static play.test.Helpers.*;
  */
 public class UnitTest{
 
-    @Inject
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnitTest.class);
+
     private JPAApi jpaApi;
 
     @Before
     public void init() throws Exception {
-        jpaApi = mock(JPAApi.class);
+
     }
 
     @Test
@@ -84,7 +85,7 @@ public class UnitTest{
                 .setName("Play Action")
                 .setPrice(10.5)
                 .createBook();
-        when(repository.add(any())).thenReturn(supplyAsync(() -> book));
+        when(repository.add(any(Book.class))).thenReturn(supplyAsync(() -> book));
 
         final Http.RequestBuilder requestBuilder = new Http.RequestBuilder().method("post").bodyJson(Json.toJson(book));
 
@@ -95,48 +96,35 @@ public class UnitTest{
             return controller.addBook();
         });
 
-        //test the completed result
-        await().atMost(1, TimeUnit.SECONDS).until(() ->
-                assertThat(stage.toCompletableFuture()).isCompletedWithValueMatching(result ->
-                        result.status() == SEE_OTHER, "Should direct after operation"
-                )
-        );
-    }
+        verify(repository).add(book);
 
-
-    @Test
-    public void checkAddBooks() throws Exception {
-        MessagesApi messages = mock(MessagesApi.class);
-        Validator validator = mock(Validator.class);
-        FormFactory formFactory = new FormFactory(messages, new Formatters(messages), validator);
-
-        BookRepository repository = mock(BookRepository.class);
-        SBookRepository srepository = mock(SBookRepository.class);
-
-        final Http.RequestBuilder requestBuilder = new Http.RequestBuilder().method("get");
-
-        final Result stage = invokeWithContext(requestBuilder, () -> {
-            HttpExecutionContext ec = new HttpExecutionContext(ForkJoinPool.commonPool());
-
-            final BookController controller = new BookController(formFactory, repository,srepository, ec);
-            return controller.addBooks();
+        await().atMost(1, TimeUnit.SECONDS).until(() -> {
+            assertThat(stage.toCompletableFuture()).isCompletedWithValueMatching(result ->
+                result.status() == SEE_OTHER, ""
+            );
         });
 
-        Thread.sleep(100);
+
 
     }
+
+    @Test
+    public void getBook() throws Exception {
+        BookRepository repository = mock(BookRepository.class);
+        verify(repository).get(1L);
+    }
+
 
     @Test
     public void removeBook() throws Exception {
-        final Http.RequestBuilder requestBuilder = new Http.RequestBuilder().method("get").bodyJson(Json.toJson(1));
 
-        final CompletionStage<Result> stage = invokeWithContext(requestBuilder, () -> {
-            HttpExecutionContext ec = new HttpExecutionContext(ForkJoinPool.commonPool());
-
+        final Http.RequestBuilder requestBuilder1 = new Http.RequestBuilder().method("get").bodyJson(Json.toJson(1));
+        final CompletionStage<Result> stage = invokeWithContext(requestBuilder1, () -> {
             FormFactory formFactory = mock(FormFactory.class);
             BookRepository repository = mock(BookRepository.class);
             SBookRepository srepository = mock(SBookRepository.class);
-            final BookController controller = new BookController(formFactory, repository,srepository, ec);
+            HttpExecutionContext ec = new HttpExecutionContext(ForkJoinPool.commonPool());
+            final BookController controller = new BookController(formFactory, repository, srepository, ec);
             return controller.deleteBook(1);
         });
 
@@ -145,23 +133,34 @@ public class UnitTest{
                         result.status() == SEE_OTHER, ""
                 )
         );
+        Thread.sleep(100);
     }
+
 
     @Test
     public void addBoosTest() throws Exception {
-        running(fakeApplication(), new Runnable() {
 
-            @Transactional
+        running(fakeApplication(), new Runnable() {
             @Override
             public void run() {
-                SBookRepository repository = mock(SBookRepository.class);
-                Book book = new Book.BookBuilder().setName("Java 1").createBook();
-                when(repository.add(book)).thenReturn(book);
+
+                JPA.withTransaction(() -> {
+                    EntityManager em = JPA.em();
+                    Book book = new Book.BookBuilder()
+                            .setName("Play Action")
+                            .setPrice(10.5)
+                            .createBook();
+                    em.persist(book);
+
+                    Book actualBook = em.find(Book.class, book.getId());
+
+                    Assert.assertEquals(actualBook, book);
+                });
             }
         });
-
 
         Thread.sleep(100);
 
     }
+
 }

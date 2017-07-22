@@ -19,24 +19,22 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class SJPABookRepository implements SBookRepository{
 
     private final JPAApi jpaApi;
-    private final DatabaseExecutionContext executionContext;
 
     @Inject
-    public SJPABookRepository(JPAApi jpaApi, DatabaseExecutionContext executionContext) {
+    public SJPABookRepository(JPAApi jpaApi) {
         this.jpaApi = jpaApi;
-        this.executionContext = executionContext;
     }
 
     @Override
     public Book add(Book book) {
-        //jpaApi.withTransaction(() -> {
+        jpaApi.withTransaction(() -> {
             EntityManager em = jpaApi.em();
             em.getTransaction().begin();
             //insert(em, book);
             em.persist(book);
             em.getTransaction().commit();
             em.close();
-        //});
+        });
         return book;
     }
 
