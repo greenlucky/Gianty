@@ -1,0 +1,43 @@
+@(products: List[Product])
+@import helper._
+
+@main("List of products") {
+
+    <h2>All products</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>EAN</th>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+        @for(product <- products) {
+            <tr>
+                <td>
+                    <a href="@routes.ProductController.details(product.ean)">@product.ean</a>
+                </td>
+                <td>
+                    <a href="@routes.ProductController.details(product.ean)">@product.name</a>
+                </td>
+                <td>
+                    <a href="@routes.ProductController.details(product.ean)">@product.description</a>
+                </td>
+                <td>
+                    <a href="@routes.ProductController.details(product.ean)"><i class="icon icon-pencil"></i></a>
+                    <a class="btnDel" attrUrl="@routes.ProductController.details(product.ean)"><i class="icon icon-trash"></i></a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <a href="@routes.ProductController.newProduct()" class="btn">
+        <i class="icon-plus"></i> New product
+    </a>
+    @helper.form(action =  routes.ProductController.delete("1")) {
+        @CSRF.formField
+    }
+}
+
